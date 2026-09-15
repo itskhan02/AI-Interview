@@ -15,9 +15,20 @@ const app = express();
 
 app.use(express.json());
 
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://intelliprep-ai.onrender.com"]
+    : ["http://localhost:5173"];
+
 app.use(
   cors({
-    origin: "https://intelliprep-ai.onrender.com/ || http://localhost:5173",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
@@ -34,9 +45,9 @@ app.use("/api/payment", paymentRouter);
 const PORT = process.env.PORT || 5005;
 
 app.get("/", (req, res) => {
-  res.send("Server is online");
+  res.status(200).send("Server is online");
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
