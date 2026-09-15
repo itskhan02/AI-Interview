@@ -72,7 +72,13 @@ const sendOtp = async (req, res) => {
 
     const otpExpire = new Date(Date.now() + 5 * 60 * 1000);
 
-    await sendOTP(phone, otp);
+    const message = await sendOTP(phone, otp);
+
+    console.info("OTP SMS accepted:", {
+      sid: message.sid,
+      status: message.status,
+      to: phone.replace(/.(?=.{4})/g, "*"),
+    });
 
     await User.findOneAndUpdate(
       { phone },
