@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import {
   User,
   Camera,
@@ -17,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { clearUserData, setUserData } from "../redux/userSlice";
+import { FaArrowLeft } from "react-icons/fa";
 
 const ProfileSetting = () => {
   const { userData } = useSelector((state) => state.user);
@@ -154,9 +156,20 @@ const ProfileSetting = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 py-10">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-10 py-10">
+      <motion.button
+        whileHover={{
+          scale: 1.04,
+          x: -2,
+        }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate("/history")}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 transition-all duration-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-400"
+      >
+        <FaArrowLeft className="text-sm" />
+      </motion.button>
+      <div className="max-w-6xl mx-auto">
+        <div className="my-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />

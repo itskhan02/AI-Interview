@@ -43,7 +43,6 @@ const Navbar = ({ openAuth }) => {
     // { to: "/settings", label: "Settings", icon: Settings },
   ];
 
-
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -62,11 +61,9 @@ const Navbar = ({ openAuth }) => {
     };
   }, []);
 
-
   const isActive = (route) => {
     return location.pathname === route;
   };
-
 
   const handleProtectedNavigation = (route) => {
     if (userData) {
@@ -104,7 +101,6 @@ const Navbar = ({ openAuth }) => {
     }
   };
 
-
   const navButtonClass = (active) => `
     px-3 py-1.5
     rounded-md
@@ -139,14 +135,13 @@ const Navbar = ({ openAuth }) => {
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
-        className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4">
-        <nav
-          className="w-full max-w-3xl glass-strong rounded-3xl px-6 py-2 flex items-center justify-between border border-white/10 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
+        className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4"
+      >
+        <nav className="w-full max-w-3xl glass-strong rounded-3xl px-6 py-2 flex items-center justify-between border border-white/10 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.25)]">
           {/* Logo */}
 
           <Link to="/" className="flex items-center gap-3 shrink-0">
-            <span
-              className="h-8 w-8 rounded-2xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg">
+            <span className="h-8 w-8 rounded-2xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg">
               <BrainCircuit size={20} className="text-amber-300" />
             </span>
 
@@ -154,7 +149,6 @@ const Navbar = ({ openAuth }) => {
               IntelliPrep.AI
             </span>
           </Link>
-
 
           <div className="hidden md:flex items-center gap-4">
             {userData &&
@@ -169,7 +163,6 @@ const Navbar = ({ openAuth }) => {
                 </button>
               ))}
           </div>
-
 
           <div className="flex items-center gap-6">
             {/* Credits */}
@@ -392,9 +385,17 @@ const Navbar = ({ openAuth }) => {
                     px-2
                   "
                 >
-                  {userData?.name?.slice(0, 2).toUpperCase() ||
+                  {userData?.profileImage ? (
+                    <img
+                      src={userData.profileImage}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    userData?.name?.slice(0, 2).toUpperCase() ||
                     userData?.email?.slice(0, 1)?.toUpperCase() ||
-                    "U"}
+                    "U"
+                  )}
                 </button>
 
                 <AnimatePresence>
@@ -446,24 +447,39 @@ const Navbar = ({ openAuth }) => {
                         "
                       >
                         <div className="flex items-center gap-3">
-                          <div
+                          <button
+                            type="button"
+                            onClick={() => setDropdownOpen((prev) => !prev)}
                             className="
-                              h-10 w-10
-                              rounded-full
-                              bg-gradient-to-br
-                              from-teal-500
-                              to-cyan-500
-                              flex items-center justify-center
-                              text-white
-                              text-base
-                              font-bold
-                              shadow-lg
-                            "
+    flex items-center
+    h-8 w-8
+    justify-center
+    rounded-full
+    bg-teal-500/10
+    hover:bg-teal-500/20
+    transition-all duration-200
+    text-teal-400
+    text-[14px]
+    font-bold
+    ring-1
+    ring-teal-500/60
+    hover:ring-teal-500/50
+    hover:scale-105
+    overflow-hidden
+  "
                           >
-                            {userData?.name?.slice(0, 2).toUpperCase() ||
+                            {userData?.profileImage ? (
+                              <img
+                                src={userData.profileImage}
+                                alt="Profile"
+                                className="h-full w-full rounded-full object-cover"
+                              />
+                            ) : (
+                              userData?.name?.slice(0, 2).toUpperCase() ||
                               userData?.email?.slice(0, 1)?.toUpperCase() ||
-                              "U"}
-                          </div>
+                              "U"
+                            )}
+                          </button>
 
                           <div className="flex flex-col gap-1 flex-1 min-w-0">
                             <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -673,7 +689,15 @@ const Navbar = ({ openAuth }) => {
                         font-bold
                       "
                     >
-                      {userData?.name?.slice(0, 2)?.toUpperCase() || "U"}
+                      {userData?.profileImage ? (
+                        <img
+                          src={userData.profileImage}
+                          alt="Profile"
+                          className="h-full w-full rounded-full object-cover"
+                        />
+                      ) : (
+                        userData?.name?.slice(0, 2)?.toUpperCase() || "U"
+                      )}
                     </div>
 
                     <div className="min-w-0">
