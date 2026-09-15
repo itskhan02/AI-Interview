@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
+import logo from "../../public/logo.png";
+
+
 
 const Auth = ({ isModel = false }) => {
   const navigate = useNavigate();
@@ -54,8 +57,9 @@ const Auth = ({ isModel = false }) => {
         }`}
       >
         <div className="flex items-center justify-center mb-6 gap-3">
-          <span className="h-8 w-8 inline-flex rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 items-center justify-center">
-            <BrainCircuit className="text-amber-300" />
+          <span className="h-8 w-8 rounded-2xl  flex items-center justify-center shadow-lg">
+            {/* <BrainCircuit size={20} className="text-amber-300" /> */}
+              <img src={logo} alt="logo"></img>
           </span>
           <h2 className="gradient-text font-bold text-lg">IntelliPrep.AI</h2>
         </div>
@@ -68,7 +72,7 @@ const Auth = ({ isModel = false }) => {
               AI Smart Interview
             </span>
           </h1>
-          <p className="text-center text-sm px-6 md:px-0 text-gray-500 leading-relaxed mb-2">
+          <p className="text-center text-sm px-6 md:px-0 text-gray-100 font-semibold leading-relaxed mb-2">
             Sign in to start AI-powered mock interviews and track your
             performance insights.
           </p>

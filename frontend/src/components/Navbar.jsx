@@ -15,6 +15,8 @@ import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import api from "../utils/api";
 import { setUserData } from "../redux/userSlice";
+import logo from "../../public/logo.png";
+
 
 const Navbar = ({ openAuth }) => {
   const navigate = useNavigate();
@@ -135,8 +137,9 @@ const Navbar = ({ openAuth }) => {
           {/* Logo */}
 
           <Link to="/" className="flex items-center gap-3 shrink-0">
-            <span className="h-8 w-8 rounded-2xl bg-gradient-to-br from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg">
-              <BrainCircuit size={20} className="text-amber-300" />
+            <span className="h-8 w-8 rounded-2xl  flex items-center justify-center shadow-lg">
+              {/* <BrainCircuit size={20} className="text-amber-300" /> */}
+              <img src={logo} alt="logo"></img>
             </span>
 
             <span className="gradient-text font-bold text-lg">
