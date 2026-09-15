@@ -11,6 +11,7 @@ import { setUserData } from "./redux/userSlice";
 import InterviewHistory from "./pages/InterviewHistory";
 import Pricing from "./pages/Pricing";
 import InterviewReport from "./pages/InterviewReport";
+import ProfileSetting from "./pages/ProfileSetting";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -82,6 +83,15 @@ const App = () => {
         element={
           <ProtectedRoute>
             <InterviewReport />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <ProfileSetting />
           </ProtectedRoute>
         }
       />

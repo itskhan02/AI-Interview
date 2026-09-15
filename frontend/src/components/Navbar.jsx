@@ -40,7 +40,7 @@ const Navbar = ({ openAuth }) => {
 
   const mobileExtraLinks = [
     { to: "/profile", label: "Profile Settings", icon: User },
-    { to: "/settings", label: "Settings", icon: Settings },
+    // { to: "/settings", label: "Settings", icon: Settings },
   ];
 
 
@@ -508,45 +508,6 @@ const Navbar = ({ openAuth }) => {
                           />
 
                           <span className="flex-1">Profile Settings</span>
-
-                          <ChevronDown
-                            size={14}
-                            className="
-                              text-gray-400
-                              opacity-0
-                              group-hover:opacity-100
-                              transition-opacity
-                              -rotate-90
-                            "
-                          />
-                        </Link>
-
-                        <Link
-                          to="/settings"
-                          onClick={() => setDropdownOpen(false)}
-                          className="
-                            flex items-center gap-3
-                            px-3 py-2.5
-                            rounded-xl
-                            text-sm
-                            text-gray-700
-                            dark:text-gray-300
-                            hover:bg-gray-100
-                            dark:hover:bg-gray-800
-                            transition-all
-                            group
-                          "
-                        >
-                          <Settings
-                            size={18}
-                            className="
-                              text-gray-400
-                              group-hover:text-teal-500
-                              transition-colors
-                            "
-                          />
-
-                          <span className="flex-1">Settings</span>
 
                           <ChevronDown
                             size={14}
