@@ -12,6 +12,8 @@ import {
   GraduationCap,
   Sparkles,
   AlertTriangle,
+  Check,
+  X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +30,8 @@ const ProfileSetting = () => {
 
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,6 +43,7 @@ const ProfileSetting = () => {
   });
 
   const [preview, setPreview] = useState("");
+  const [imageHover, setImageHover] = useState(false);
 
   useEffect(() => {
     if (userData) {
@@ -62,6 +67,8 @@ const ProfileSetting = () => {
       ...prev,
       [name]: value,
     }));
+
+    setHasChanges(true);
   };
 
   const handleImageChange = (e) => {
@@ -80,6 +87,7 @@ const ProfileSetting = () => {
     }
 
     setPreview(URL.createObjectURL(file));
+    setHasChanges(true);
   };
 
   const handleSave = async () => {
@@ -114,6 +122,7 @@ const ProfileSetting = () => {
         fileRef.current.value = "";
       }
 
+      setHasChanges(false);
       toast.success("Profile updated successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update profile");
@@ -123,12 +132,6 @@ const ProfileSetting = () => {
   };
 
   const handleDeleteAccount = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to permanently delete your account? This action cannot be undone.",
-    );
-
-    if (!confirmed) return;
-
     try {
       setDeleteLoading(true);
 
@@ -144,52 +147,69 @@ const ProfileSetting = () => {
       toast.error(error.response?.data?.message || "Failed to delete account");
     } finally {
       setDeleteLoading(false);
+      setShowDeleteConfirm(false);
     }
   };
 
   if (!userData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
-        <p>Please login to view your profile.</p>
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gray-800 flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-gray-500" />
+          </div>
+          <p className="text-gray-400">Please login to view your profile.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-10 py-10">
-      <motion.button
-        whileHover={{
-          scale: 1.04,
-          x: -2,
-        }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => navigate("/history")}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 transition-all duration-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-400"
-      >
-        <FaArrowLeft className="text-sm" />
-      </motion.button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 px-4 sm:px-6 lg:px-10 py-8 sm:py-10">
       <div className="max-w-6xl mx-auto">
-        <div className="my-8">
+        {/* Back button */}
+        <motion.button
+          whileHover={{ scale: 1.04, x: -2 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/history")}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 transition-all duration-300 hover:border-cyan-400/30 hover:bg-cyan-400/10 hover:text-cyan-400 mb-6"
+        >
+          <FaArrowLeft className="text-sm" />
+        </motion.button>
+
+        {/* Header */}
+        <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-bold text-white">
-              Profile Settings
-            </h1>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                Profile Settings
+              </h1>
+              <p className="text-sm text-gray-400 mt-0.5">
+                Manage your personal information and IntelliPrep profile.
+              </p>
+            </div>
           </div>
-
-          <p className="text-gray-400">
-            Manage your personal information and IntelliPrep profile.
-          </p>
         </div>
 
-        <div className="bg-gray-900/80 border border-gray-800 rounded-3xl shadow-2xl overflow-hidden">
-          <div className="p-6 md:p-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-8 border-b border-gray-800">
-              <div className="relative">
-                <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-800 bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+        <div className="bg-gray-900/80 border border-gray-800 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
+          {/* Profile Header Section - Redesigned */}
+          <div className="relative p-6 md:p-8 border-b border-gray-800">
+            {/* Subtle gradient background */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-purple-600/5 via-transparent to-blue-600/5" />
+
+            <div className="relative flex flex-col items-center gap-6 sm:flex-row sm:items-center">
+              {/* Profile Picture - Better Alignment */}
+              <div className="relative shrink-0">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  onHoverStart={() => setImageHover(true)}
+                  onHoverEnd={() => setImageHover(false)}
+                  className="relative w-32 h-32 rounded-full overflow-hidden ring-4 ring-gray-800 ring-offset-4 ring-offset-gray-900 bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shadow-xl shadow-purple-500/20"
+                >
                   {preview ? (
                     <img
                       src={preview}
@@ -197,17 +217,32 @@ const ProfileSetting = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-white" />
+                    <User className="w-14 h-14 text-white" />
                   )}
-                </div>
 
-                <button
+                  {/* Overlay on hover */}
+                  {imageHover && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer"
+                      onClick={() => fileRef.current?.click()}
+                    >
+                      <Camera className="w-6 h-6 text-white" />
+                    </motion.div>
+                  )}
+                </motion.div>
+
+                {/* Camera button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center shadow-lg transition"
+                  className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white flex items-center justify-center shadow-lg shadow-purple-500/30 border-2 border-gray-900 transition-all"
                 >
                   <Camera className="w-4 h-4" />
-                </button>
+                </motion.button>
 
                 <input
                   ref={fileRef}
@@ -218,63 +253,93 @@ const ProfileSetting = () => {
                 />
               </div>
 
-              <div className="text-center sm:text-left">
-                <h2 className="text-xl font-semibold text-white">
+              {/* User Info - Better Alignment */}
+              <div className="flex-1 text-center sm:text-left">
+                <h2 className="text-2xl font-semibold text-white">
                   {userData.name || "Your Name"}
                 </h2>
 
-                <p className="text-gray-400 mt-1">
-                  {userData.email || userData.phone || "IntelliPrep User"}
-                </p>
+                <div className="mt-2 flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-3 text-gray-400">
+                  {userData.email && (
+                    <span className="flex items-center gap-1.5 text-sm">
+                      <Mail className="w-4 h-4 text-gray-500" />
+                      {userData.email}
+                    </span>
+                  )}
+                  {userData.phone && (
+                    <>
+                      <span className="hidden sm:block text-gray-600">•</span>
+                      <span className="flex items-center gap-1.5 text-sm">
+                        <Phone className="w-4 h-4 text-gray-500" />
+                        {userData.phone}
+                      </span>
+                    </>
+                  )}
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="mt-4 text-sm text-purple-400 hover:text-purple-300"
-                >
-                  Change profile picture
-                </button>
-
-                <p className="text-xs text-gray-500 mt-1">
-                  JPG, PNG or WebP · Maximum 5MB
-                </p>
-              </div>
-            </div>
-
-            <div className="py-8 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Full Name
-                </label>
-
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter your name"
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 transition"
-                  />
+                {/* Status badge */}
+                <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-[11px] font-medium text-green-400">
+                    Active
+                  </span>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Email
-                </label>
+              {/* Save indicator on desktop */}
+              {hasChanges && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="hidden sm:flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-3 py-2"
+                >
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="text-xs font-medium text-amber-400">
+                    Unsaved changes
+                  </span>
+                </motion.div>
+              )}
+            </div>
+          </div>
 
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+          {/* Form Section */}
+          <div className="p-6 md:p-8">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Full Name <span className="text-red-400">*</span>
+                  </label>
 
-                  <input
-                    type="email"
-                    value={userData.email || ""}
-                    disabled
-                    className="w-full bg-gray-800/60 border border-gray-700 text-gray-500 rounded-xl py-3 pl-11 pr-4 cursor-not-allowed"
-                  />
+                  <div className="relative group">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 transition-colors group-focus-within:text-purple-400" />
+
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Enter your name"
+                      className="w-full bg-gray-800/70 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all placeholder:text-gray-600"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email
+                  </label>
+
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
+
+                    <input
+                      type="email"
+                      value={userData.email || ""}
+                      disabled
+                      className="w-full bg-gray-800/40 border border-gray-800 text-gray-500 rounded-xl py-3 pl-11 pr-4 cursor-not-allowed"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -285,13 +350,13 @@ const ProfileSetting = () => {
                   </label>
 
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600" />
 
                     <input
                       type="text"
                       value={userData.phone}
                       disabled
-                      className="w-full bg-gray-800/60 border border-gray-700 text-gray-500 rounded-xl py-3 pl-11 pr-4 cursor-not-allowed"
+                      className="w-full bg-gray-800/40 border border-gray-800 text-gray-500 rounded-xl py-3 pl-11 pr-4 cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -303,8 +368,8 @@ const ProfileSetting = () => {
                     Target Role
                   </label>
 
-                  <div className="relative">
-                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <div className="relative group">
+                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 transition-colors group-focus-within:text-purple-400" />
 
                     <input
                       type="text"
@@ -312,7 +377,7 @@ const ProfileSetting = () => {
                       value={formData.targetRole}
                       onChange={handleChange}
                       placeholder="e.g. Full Stack Developer"
-                      className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 transition"
+                      className="w-full bg-gray-800/70 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all placeholder:text-gray-600"
                     />
                   </div>
                 </div>
@@ -322,8 +387,8 @@ const ProfileSetting = () => {
                     Education
                   </label>
 
-                  <div className="relative">
-                    <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <div className="relative group">
+                    <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 transition-colors group-focus-within:text-purple-400" />
 
                     <input
                       type="text"
@@ -331,7 +396,7 @@ const ProfileSetting = () => {
                       value={formData.education}
                       onChange={handleChange}
                       placeholder="e.g. B.Tech CSE"
-                      className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 transition"
+                      className="w-full bg-gray-800/70 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all placeholder:text-gray-600"
                     />
                   </div>
                 </div>
@@ -343,19 +408,18 @@ const ProfileSetting = () => {
                     Experience
                   </label>
 
-                  <select
-                    name="experience"
-                    value={formData.experience}
-                    onChange={handleChange}
-                    className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl py-3 px-4 outline-none focus:border-purple-500 transition"
-                  >
-                    <option value="">Select experience</option>
-                    <option value="Fresher">Fresher</option>
-                    <option value="0-1 years">0-1 years</option>
-                    <option value="1-2 years">1-2 years</option>
-                    <option value="2-5 years">2-5 years</option>
-                    <option value="5+ years">5+ years</option>
-                  </select>
+                  <div className="relative group">
+                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 transition-colors group-focus-within:text-purple-400" />
+
+                    <input
+                      type="text"
+                      name="experience"
+                      value={formData.experience}
+                      onChange={handleChange}
+                      placeholder="e.g. Fresher, 6 months, 2 years"
+                      className="w-full bg-gray-800/70 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all placeholder:text-gray-600"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -363,8 +427,8 @@ const ProfileSetting = () => {
                     Location
                   </label>
 
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <div className="relative group">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 transition-colors group-focus-within:text-purple-400" />
 
                     <input
                       type="text"
@@ -372,7 +436,7 @@ const ProfileSetting = () => {
                       value={formData.location}
                       onChange={handleChange}
                       placeholder="e.g. Punjab, India"
-                      className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 transition"
+                      className="w-full bg-gray-800/70 border border-gray-700 text-white rounded-xl py-3 pl-11 pr-4 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all placeholder:text-gray-600"
                     />
                   </div>
                 </div>
@@ -390,34 +454,49 @@ const ProfileSetting = () => {
                   maxLength={500}
                   rows={5}
                   placeholder="Tell us a little about yourself..."
-                  className="w-full bg-gray-800 border border-gray-700 text-white rounded-xl py-3 px-4 outline-none focus:border-purple-500 transition resize-none"
+                  className="w-full bg-gray-800/70 border border-gray-700 text-white rounded-xl py-3 px-4 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none placeholder:text-gray-600"
                 />
 
-                <p className="text-xs text-gray-500 text-right mt-1">
-                  {formData.bio.length}/500
-                </p>
+                <div className="flex justify-end mt-1">
+                  <p
+                    className={`text-xs ${
+                      formData.bio.length > 450
+                        ? "text-amber-400"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    {formData.bio.length}/500
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-gray-800">
-              <button
+            {/* Save Button */}
+            <div className="pt-6 mt-6 border-t border-gray-800">
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={handleSave}
-                disabled={loading}
-                className="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium flex items-center justify-center gap-2 transition disabled:opacity-50"
+                disabled={loading || !hasChanges}
+                className="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 {loading ? (
-                  "Saving..."
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
                 ) : (
                   <>
                     <Save className="w-5 h-5" />
                     Save Changes
                   </>
                 )}
-              </button>
+              </motion.button>
             </div>
           </div>
 
+          {/* Danger Zone */}
           <div className="border-t border-red-900/40 bg-red-950/20 p-6 md:p-8">
             <div className="flex gap-4">
               <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center shrink-0">
@@ -434,16 +513,54 @@ const ProfileSetting = () => {
                   cannot be undone.
                 </p>
 
-                <button
-                  type="button"
-                  onClick={handleDeleteAccount}
-                  disabled={deleteLoading}
-                  className="px-5 py-2.5 rounded-xl border border-red-500/40 text-red-400 hover:bg-red-500/10 transition flex items-center gap-2 disabled:opacity-50"
-                >
-                  <Trash2 className="w-4 h-4" />
+                {!showDeleteConfirm ? (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="px-5 py-2.5 rounded-xl border border-red-500/40 text-red-400 hover:bg-red-500/10 transition-all flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Account
+                  </motion.button>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-wrap items-center gap-3"
+                  >
+                    <span className="text-sm text-red-300">Are you sure?</span>
 
-                  {deleteLoading ? "Deleting..." : "Delete Account"}
-                </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteLoading}
+                      className="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-all flex items-center gap-2 disabled:opacity-50"
+                    >
+                      {deleteLoading ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                          Deleting...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Yes, delete
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="px-4 py-2 rounded-xl border border-gray-700 text-gray-400 hover:bg-white/5 transition-all flex items-center gap-2"
+                    >
+                      <X className="w-4 h-4" />
+                      Cancel
+                    </button>
+                  </motion.div>
+                )}
               </div>
             </div>
           </div>
