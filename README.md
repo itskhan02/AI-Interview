@@ -74,38 +74,6 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 ```
 
-### Backend
-
-```env
-NODE_ENV=development
-PORT=5005
-CLIENT_URL=http://localhost:5173
-MONGO_URI=mongodb+srv://<username>:<password>@<cluster>/<database>
-JWT_SECRET=<replace-with-strong-secret>
-TWILIO_SID=<twilio-account-sid>
-TWILIO_AUTH_TOKEN=<twilio-auth-token>
-TWILIO_PHONE=<twilio-phone-number>
-OPENROUTER_API_KEY=<openrouter-api-key>
-RAZORPAY_KEY_ID=<razorpay-key-id>
-RAZORPAY_KEY_SECRET=<razorpay-key-secret>
-```
-
-### Frontend
-
-```env
-VITE_API_URL=http://localhost:5005/api
-VITE_ASSET_URL=http://localhost:5005
-VITE_FIREBASE_API_KEY=<firebase-api-key>
-VITE_FIREBASE_AUTH_DOMAIN=<firebase-auth-domain>
-VITE_FIREBASE_PROJECT_ID=<firebase-project-id>
-VITE_FIREBASE_STORAGE_BUCKET=<firebase-storage-bucket>
-VITE_FIREBASE_MESSAGING_SENDER_ID=<firebase-messaging-sender-id>
-VITE_FIREBASE_APP_ID=<firebase-app-id>
-VITE_RAZORPAY_KEY_ID=<razorpay-key-id>
-```
-
-Never commit real `.env` files or backend secrets.
-
 ## Local Development
 
 Install backend dependencies:
