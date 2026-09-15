@@ -15,10 +15,10 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? ["https://intelliprep-ai.onrender.com"]
-    : ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://intelliprep-ai.onrender.com",
+];
 
 app.use(
   cors({
