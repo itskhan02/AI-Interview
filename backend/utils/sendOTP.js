@@ -1,11 +1,14 @@
 import twilio from "twilio";
 
+const requiredTwilioEnvVars = ["TWILIO_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE"];
+
 const sendOTP = async (phone, otp) => {
   try {
     const { TWILIO_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE } = process.env;
+    const missingEnvVars = requiredTwilioEnvVars.filter((key) => !process.env[key]);
 
-    if (!TWILIO_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE) {
-      throw new Error("Twilio configuration missing");
+    if (missingEnvVars.length > 0) {
+      throw new Error(`Twilio configuration missing: ${missingEnvVars.join(", ")}`);
     }
 
     const client = twilio(TWILIO_SID, TWILIO_AUTH_TOKEN);
@@ -18,7 +21,12 @@ const sendOTP = async (phone, otp) => {
 
     return message;
   } catch (error) {
-    console.error("Twilio SMS failed:", error.message);
+    console.error("Twilio SMS failed:", {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      moreInfo: error.moreInfo,
+    });
     throw error;
   }
 };

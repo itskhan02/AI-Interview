@@ -9,28 +9,31 @@ import userRouter from "./routes/userRoutes.js";
 import InterviewRouter from "./routes/interviewRoutes.js";
 import paymentRouter from "./routes/paymentRoutes.js";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 const allowedOrigins = [
   "http://localhost:5173",
   "https://intelliprep-ai.onrender.com",
 ];
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  }),
+  cors(corsOptions),
 );
 
 app.use(cookiesParser());
@@ -49,5 +52,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+  console.info(`Server running on port ${PORT}`);
 });

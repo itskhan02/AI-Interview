@@ -24,6 +24,8 @@ import { setUserData } from "../redux/userSlice";
 
 
 const PhoneInput = ReactPhoneInput.default || ReactPhoneInput;
+const phoneRegex = /^\+[1-9]\d{7,14}$/;
+const otpRegex = /^\d{6}$/;
 
 const Auth = ({isModel = false}) => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
@@ -37,6 +39,11 @@ const Auth = ({isModel = false}) => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const getFormattedPhone = () => {
+    const digits = phone.replace(/\D/g, "");
+    return digits ? `+${digits}` : "";
+  };
 
   const handleGoogleSignIn = async () => {
     try {
@@ -73,10 +80,13 @@ const Auth = ({isModel = false}) => {
   }, [resendTimer]);
 
   const validatePhone = () => {
-    if (!phone || phone.length < 10) {
-      setPhoneError("Please enter a valid phone number");
+    const formattedPhone = getFormattedPhone();
+
+    if (!phoneRegex.test(formattedPhone)) {
+      setPhoneError("Please enter a valid phone number with country code");
       return false;
     }
+
     setPhoneError("");
     return true;
   };
@@ -86,7 +96,7 @@ const Auth = ({isModel = false}) => {
 
     try {
       setLoading(true);
-      await sendOtp("+" + phone);
+      await sendOtp(getFormattedPhone());
 
       toast.success("OTP sent successfully!");
 
@@ -101,10 +111,11 @@ const Auth = ({isModel = false}) => {
 
   const handleResendOtp = async () => {
     if (resendTimer > 0) return;
+    if (!validatePhone()) return;
 
     try {
       setLoading(true);
-      await sendOtp("+" + phone);
+      await sendOtp(getFormattedPhone());
       toast.success("OTP resent successfully!");
 
       setResendTimer(30);
@@ -118,14 +129,14 @@ const Auth = ({isModel = false}) => {
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp || otp.length < 4) {
+    if (!otpRegex.test(otp)) {
       toast.error("Please enter the 6-digit OTP");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await verifyOtp("+" + phone, otp);
+      const res = await verifyOtp(getFormattedPhone(), otp);
       localStorage.setItem("token", res.data.token);
       toast.success("Login Successful! Welcome to IntelliPrep.AI!");
 
@@ -315,6 +326,8 @@ const Auth = ({isModel = false}) => {
             >
               <div className="relative bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4">
                 <button
+                  type="button"
+                  aria-label="Close phone verification"
                   onClick={handleClose}
                   className="absolute right-4 top-4 p-1 hover:bg-white/10 rounded-full transition-colors"
                 >
@@ -323,6 +336,8 @@ const Auth = ({isModel = false}) => {
 
                 {step === 2 && (
                   <button
+                    type="button"
+                    aria-label="Back to phone number"
                     onClick={() => {
                       setStep(1);
                       setOtp("");
@@ -356,7 +371,10 @@ const Auth = ({isModel = false}) => {
                 {step === 1 ? (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300">
+                      <label
+                        htmlFor="phone-number"
+                        className="text-sm font-medium text-gray-300"
+                      >
                         Phone Number
                       </label>
                       <div className="phone-input-container">
@@ -364,8 +382,17 @@ const Auth = ({isModel = false}) => {
                           country={"in"}
                           value={phone}
                           onChange={(phone) => {
-                            setPhone(phone);
+                            setPhone(phone.replace(/\D/g, ""));
                             setPhoneError("");
+                          }}
+                          inputProps={{
+                            id: "phone-number",
+                            name: "phone",
+                            autoComplete: "tel",
+                            "aria-invalid": Boolean(phoneError),
+                            "aria-describedby": phoneError
+                              ? "phone-error"
+                              : undefined,
                           }}
                           inputStyle={{
                             width: "100%",
@@ -405,13 +432,17 @@ const Auth = ({isModel = false}) => {
                         />
                       </div>
                       {phoneError && (
-                        <p className="text-red-400 text-xs mt-1">
+                        <p
+                          id="phone-error"
+                          className="text-red-400 text-xs mt-1"
+                        >
                           {phoneError}
                         </p>
                       )}
                     </div>
 
                     <button
+                      type="button"
                       onClick={handleSendOtp}
                       disabled={loading}
                       className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02]"
@@ -429,11 +460,18 @@ const Auth = ({isModel = false}) => {
                 ) : (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-300">
+                      <label
+                        htmlFor="otp-code"
+                        className="text-sm font-medium text-gray-300"
+                      >
                         Verification Code
                       </label>
                       <input
+                        id="otp-code"
+                        name="otp"
                         type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
                         placeholder="Enter 6-digit OTP"
                         value={otp}
                         onChange={(e) =>
@@ -450,8 +488,9 @@ const Auth = ({isModel = false}) => {
                     </div>
 
                     <button
+                      type="button"
                       onClick={handleVerifyOtp}
-                      disabled={loading || !otp}
+                      disabled={loading || otp.length !== 6}
                       className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02]"
                     >
                       {loading ? (
@@ -466,6 +505,7 @@ const Auth = ({isModel = false}) => {
 
                     <div className="text-center">
                       <button
+                        type="button"
                         onClick={handleResendOtp}
                         disabled={resendTimer > 0}
                         className={`text-sm transition-colors ${

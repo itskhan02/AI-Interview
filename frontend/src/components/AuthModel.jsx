@@ -24,8 +24,11 @@ const AuthModel = ({ onClose }) => {
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
         transition={{ duration: 0.25 }}
         className="relative w-full max-w-md"
+        onClick={(event) => event.stopPropagation()}
       >
         <button
+          type="button"
+          aria-label="Close authentication modal"
           onClick={onClose}
           className="absolute top-3 right-3  rounded-full p-2 text-white hover:bg-gray-700 transition "
         >

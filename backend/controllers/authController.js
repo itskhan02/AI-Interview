@@ -2,6 +2,17 @@ import User from "../models/User.js";
 import sendOTP from "../utils/sendOTP.js";
 import generateToken from "../utils/generateToken.js";
 
+const phoneRegex = /^\+[1-9]\d{7,14}$/;
+const otpRegex = /^\d{6}$/;
+
+const getSafeAuthErrorMessage = (fallback, error) => {
+  if (process.env.NODE_ENV !== "production" && error?.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 //google auth
 const googleAuth = async (req, res) => {
   try {
@@ -50,9 +61,18 @@ const sendOtp = async (req, res) => {
   try {
     const { phone } = req.body;
 
+    if (!phoneRegex.test(phone || "")) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid phone number with country code",
+      });
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const otpExpire = new Date(Date.now() + 5 * 60 * 1000);
+
+    await sendOTP(phone, otp);
 
     await User.findOneAndUpdate(
       { phone },
@@ -70,8 +90,6 @@ const sendOtp = async (req, res) => {
       },
     );
 
-    await sendOTP(phone, otp);
-
     return res.status(200).json({
       success: true,
       message: "OTP Sent",
@@ -81,7 +99,7 @@ const sendOtp = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Failed to send OTP",
+      message: getSafeAuthErrorMessage("Failed to send OTP", error),
     });
   }
 };
@@ -90,6 +108,20 @@ const sendOtp = async (req, res) => {
 const verifyOtp = async (req, res) => {
   try {
     const { phone, otp } = req.body;
+
+    if (!phoneRegex.test(phone || "")) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid phone number with country code",
+      });
+    }
+
+    if (!otpRegex.test(otp || "")) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter the 6-digit OTP",
+      });
+    }
 
     const user = await User.findOne({ phone });
 
@@ -134,7 +166,7 @@ const verifyOtp = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Failed to verify OTP",
+      message: getSafeAuthErrorMessage("Failed to verify OTP", error),
     });
   }
 };
