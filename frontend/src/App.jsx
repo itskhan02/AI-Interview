@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import api from "./utils/api";
-
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Interview from "./pages/Interview";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 import { useDispatch } from "react-redux";
 import { setUserData } from "./redux/userSlice";
 import InterviewHistory from "./pages/InterviewHistory";
