@@ -15,36 +15,16 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
 app.use(
   cors({
-    origin(origin, callback) {
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      if (
-        process.env.NODE_ENV !== "production" &&
-        origin === "http://localhost:5173"
-      ) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );
 
 app.use(cookiesParser());
+
+connectDB();
 
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRouter);
@@ -54,20 +34,9 @@ app.use("/api/payment", paymentRouter);
 const PORT = process.env.PORT || 5005;
 
 app.get("/", (req, res) => {
-  res.status(200).send("Server is online");
+  res.send("Server is online");
 });
 
-const startServer = async () => {
-  try {
-    await connectDB();
-
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error("Server startup failed:", error.message);
-    process.exit(1);
-  }
-};
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
